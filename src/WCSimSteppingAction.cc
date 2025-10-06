@@ -17,6 +17,8 @@
 #include "G4RunManager.hh"
 #include "G4OpBoundaryProcess.hh"
 
+#include "WCSimEventAction.hh"
+
 G4int WCSimSteppingAction::n_photons_through_mPMTLV = 0;
 G4int WCSimSteppingAction::n_photons_through_acrylic = 0;
 G4int WCSimSteppingAction::n_photons_through_gel = 0;
@@ -110,8 +112,8 @@ void WCSimSteppingAction::UserSteppingAction(const G4Step* aStep)
     if(track->GetTrackStatus() == fStopAndKill){
       if(boundary->GetStatus() == NoRINDEX){
 	G4cout << "Optical photon is killed because of missing refractive index in either " << thePrePoint->GetMaterial()->GetName() << " or " << thePostPoint->GetMaterial()->GetName() <<
-	  " (transition from " << thePrePV->GetName() << " to " << thePostPV->GetName() << ")" <<
-	  " : could also be caused by Overlaps with volumes with logicalBoundaries." << G4endl;
+	" (transition from " << thePrePV->GetName() << " to " << thePostPV->GetName() << ")" <<
+	" : could also be caused by Overlaps with volumes with logicalBoundaries." << G4endl;
 	
       }
       /* Debug :  
@@ -131,7 +133,68 @@ void WCSimSteppingAction::UserSteppingAction(const G4Step* aStep)
     }
   }
 
+  //for getting evis
+  if( thePrePoint->GetMaterial() && thePostPoint->GetMaterial()){
+    G4double deltaE = thePrePoint->GetKineticEnergy() - thePostPoint->GetKineticEnergy();
 
+    int pid_pdg_abs = abs(track->GetDefinition()->GetPDGEncoding());
+    G4double mom = thePrePoint->GetMomentum().mag();
+    bool is_above_Cherenkov_threshold = false;
+    
+    if( pid_pdg_abs == 11){//e
+      is_above_Cherenkov_threshold = mom >= (0.57 * MeV);
+    }
+    else if( pid_pdg_abs == 13){//mu
+      is_above_Cherenkov_threshold = mom >= (118. * MeV);
+    }
+    else if( pid_pdg_abs == 211){//pi
+      is_above_Cherenkov_threshold = mom >= (156. * MeV);
+    }
+    else if( pid_pdg_abs == 321){//K
+      is_above_Cherenkov_threshold = mom >= (554. * MeV);
+    }
+    else if( pid_pdg_abs == 2212){//p
+      is_above_Cherenkov_threshold = mom >= (1051. * MeV);
+    }
+
+    if (track->GetDefinition()->GetPDGCharge() != 0 && deltaE > 0 && is_above_Cherenkov_threshold) {
+      G4ThreeVector pospre = thePrePoint->GetPosition();
+      G4double Rpre, Zpre;
+      G4ThreeVector pospost = thePostPoint->GetPosition();
+      G4double Rpost, Zpost;
+      if(det->GetIsNuPrism()){
+	Rpre = sqrt( pospre.x()*pospre.x() + pospre.z()*pospre.z() );
+	Zpre = fabs( pospre.y());
+	Rpost = sqrt( pospost.x()*pospost.x() + pospost.z()*pospost.z() );
+	Zpost = fabs( pospost.y());
+      }
+      else{
+	Rpre = sqrt( pospre.x()*pospre.x() + pospre.y()*pospre.y() );
+	Zpre = fabs( pospre.z() );
+	Rpost = sqrt( pospost.x()*pospost.x() + pospost.y()*pospost.y() );
+	Zpost = fabs( pospost.z() );
+      }
+      
+      double WCIDR = det->GetWCIDDiameter()/2.;
+      double WCIDZ = det->GetWCIDHeight()/2.;
+      double WCODInnerR = det->GetWCODInnerDiameter()/2.;
+      double WCODInnerZ = det->GetWCODInnerHeight()/2.;
+      double WCODOuterR = det->GetWCODOuterDiameter()/2.;
+      double WCODOuterZ = det->GetWCODOuterHeight()/2.;
+      
+      WCSimEventAction* evtAct = (WCSimEventAction*) G4RunManager::GetRunManager()->GetUserEventAction();
+      
+      bool is_ID = Rpre <= WCIDR && Zpre <= WCIDZ && Rpost <= WCIDR && Zpost <= WCIDZ ;
+      bool is_OD = WCODInnerR < Rpre && Rpre <= WCODOuterR && WCODInnerZ < Zpre && Zpre <= WCODOuterZ && WCODInnerR < Rpost && Rpost <= WCODOuterR && WCODInnerZ < Zpost && Zpost <= WCODOuterZ;
+      bool is_DeadSpace = (WCIDR < Rpre && Rpre <= WCODInnerR && WCIDZ < Zpre && Zpre <= WCODInnerZ) || ( WCIDR < Rpost && Rpost <= WCODInnerR && WCIDZ < Zpost && Zpost <= WCODInnerZ);
+      if     (is_ID)         evtAct->AddEnergyDepID(deltaE);
+      else if(is_OD)         evtAct->AddEnergyDepOD(deltaE);
+      else if(is_DeadSpace)  evtAct->AddEnergyDepDS(deltaE);
+
+    }
+  }
+    
+  
 
 }
 

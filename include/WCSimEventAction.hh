@@ -31,6 +31,7 @@ private:
 
   TRandom3 * randGen;
   WCSimWCDAQMessenger* DAQMessenger;
+
   
 public:
   WCSimEventAction(WCSimRunAction*, WCSimDetectorConstruction*,
@@ -68,6 +69,7 @@ public:
 		    WCSimWCTriggeredDigitsCollection*,
 		    G4String detectorElement);
 
+  
 private:
   G4int WCSimEventFindStartingVolume( G4ThreeVector vtx);
   G4int WCSimEventFindStoppingVolume( G4String stopVolumeName);
@@ -84,6 +86,21 @@ private:
   bool     SavedOptions;
 
   G4int fEvNum;
+
+
+  //for getting evis
+private:
+  G4double fTotalEnergyDepID;
+  G4double fTotalEnergyDepDS;
+  G4double fTotalEnergyDepOD;
+public:
+  void AddEnergyDepID(G4double edep) { fTotalEnergyDepID += edep;  }
+  void AddEnergyDepDS(G4double edep) { fTotalEnergyDepDS += edep;  }
+  void AddEnergyDepOD(G4double edep) { fTotalEnergyDepOD += edep;  }
+  G4double GetTotalEnergyDepID() const { return fTotalEnergyDepID; }
+  G4double GetTotalEnergyDepDS() const { return fTotalEnergyDepDS; }
+  G4double GetTotalEnergyDepOD() const { return fTotalEnergyDepOD; }
+  
 };
 
 

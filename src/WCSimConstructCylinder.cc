@@ -137,7 +137,7 @@ G4LogicalVolume* WCSimDetectorConstruction::ConstructCylinder()
 	  WCIDRadius + WCBlackSheetThickness + WCODDeadSpace + // ID Structure
 	  WCODTyvekSheetThickness;  // Tyvek attached to structure
     outerAnnulusRadius = WCODRadius + sphereRadius;
-  }
+  }  
 #ifdef WCSIMCONSTRUCTCYLINDER_VERBOSE
   G4cout
 	<< "GEOMCHECK3 WCIDRadius \t" << WCIDRadius << G4endl
@@ -158,6 +158,27 @@ G4LogicalVolume* WCSimDetectorConstruction::ConstructCylinder()
   //BQ: Updated with new HK OD size (2020/12/06). Simply assume no tyvek thickness or dead space.
   WCLength    = WCIDHeight + 2*(WCODHeightWaterDepth + WCBlackSheetThickness + WCODDeadSpace + WCODTyvekSheetThickness + 1*mm);
   WCRadius    = (outerAnnulusRadius + WCODLateralWaterDepth)/cos(dPhi/2.) ;
+
+  //for getting evis
+  G4double DSthickness = WCBlackSheetThickness + WCODDeadSpace + WCODTyvekSheetThickness;// + WCODWLSPlatesThickness;
+  G4double odinnerdiameter = WCIDDiameter + DSthickness*2.;
+  G4double odinnerheight = WCIDHeight + DSthickness*2.;
+  G4double odouterdiameter = odinnerdiameter + WCODLateralWaterDepth*2;
+  G4double odouterheight = odinnerheight + WCODHeightWaterDepth*2;  
+  SetWCODInnerHeight(odinnerheight); 
+  SetWCODInnerDiameter(odinnerdiameter);  
+  SetWCODOuterHeight(odouterheight); 
+  SetWCODOuterDiameter(odouterdiameter);
+  //std::cout<<"GetWCODInnerHeight "<<GetWCODInnerHeight()<<std::endl;
+  //std::cout<<"GetWCODInnerDiameter "<<GetWCODInnerDiameter()<<std::endl;
+  //std::cout<<"GetWCODOuterHeight "<<GetWCODOuterHeight()<<std::endl;
+  //std::cout<<"GetWCODOuterDiameter "<<GetWCODOuterDiameter()<<std::endl;
+  //std::cout<<"WCODHeightWaterDepth "<<WCODHeightWaterDepth<<std::endl;
+  //std::cout<<"WCODLateralWaterDepth "<<WCODLateralWaterDepth<<std::endl;
+  //std::cout<<"WCIDHeight "<<WCIDHeight<<std::endl;
+  //std::cout<<"WCIDDiameter "<<WCIDDiameter<<std::endl;
+  //std::cout<<"DSthickness "<<DSthickness<<std::endl;  
+  
 #ifdef WCSIMCONSTRUCTCYLINDER_VERBOSE
   G4cout
 	<< "GEOMCHECK2 WCLength \t" << WCLength << G4endl
@@ -331,7 +352,7 @@ G4LogicalVolume* WCSimDetectorConstruction::ConstructCylinder()
 					  logicWCBarrel,
 					  false,
 					  checkOverlaps);
-
+	
 
   } // END Tyvek cave
   //-----------------------------------------------------
@@ -2735,6 +2756,26 @@ G4LogicalVolume* WCSimDetectorConstruction::ConstructCylinderNoReplica()
   //WCRadius    = (WCIDDiameter/2. + WCBlackSheetThickness + (WCODRadius+WCODHeight)))/cos(dPhi/2.) ; // BQ: Updated with new HK OD size (2020/12/06) 
   //WCLength    = WCIDHeight + 2*2.3*m;	//jl145 - reflects top veto blueprint, cf. Farshid Feyzi
   //WCRadius    = (WCIDDiameter/2. + WCBlackSheetThickness + 1.5*m)/cos(dPhi/2.) ; // TODO: OD
+  
+  //for getting evis
+  G4double DSthickness = WCBlackSheetThickness + WCODDeadSpace + WCODTyvekSheetThickness;// + WCODWLSPlatesThickness;
+  G4double odinnerdiameter = WCIDDiameter + DSthickness*2.;
+  G4double odinnerheight = WCIDHeight + DSthickness*2.;
+  G4double odouterdiameter = odinnerdiameter + WCODLateralWaterDepth*2;
+  G4double odouterheight = odinnerheight + WCODHeightWaterDepth*2;  
+  SetWCODInnerHeight(odinnerheight); 
+  SetWCODInnerDiameter(odinnerdiameter);  
+  SetWCODOuterHeight(odouterheight); 
+  SetWCODOuterDiameter(odouterdiameter);
+  //std::cout<<"GetWCODInnerHeight "<<GetWCODInnerHeight()<<std::endl;
+  //std::cout<<"GetWCODInnerDiameter "<<GetWCODInnerDiameter()<<std::endl;
+  //std::cout<<"GetWCODOuterHeight "<<GetWCODOuterHeight()<<std::endl;
+  //std::cout<<"GetWCODOuterDiameter "<<GetWCODOuterDiameter()<<std::endl;
+  //std::cout<<"WCODHeightWaterDepth "<<WCODHeightWaterDepth<<std::endl;
+  //std::cout<<"WCODLateralWaterDepth "<<WCODLateralWaterDepth<<std::endl;
+  //std::cout<<"WCIDHeight "<<WCIDHeight<<std::endl;
+  //std::cout<<"WCIDDiameter "<<WCIDDiameter<<std::endl;
+  //std::cout<<"DSthickness "<<DSthickness<<std::endl;
  
   // now we know the extend of the detector and are able to tune the tolerance
   G4GeometryManager::GetInstance()->SetWorldMaximumExtent(WCLength > WCRadius ? WCLength : WCRadius);
@@ -4251,7 +4292,7 @@ G4LogicalVolume* WCSimDetectorConstruction::ConstructCylinderNoReplica()
     G4cout << " Coverage was calculated to be: " << (icopy_top*WCPMTODRadius*WCPMTODRadius/(WCIDRadius*WCIDRadius)) << "\n";
     G4cout << " total on bottom cap: " << icopy_bot << "\n";
     G4cout << " Coverage was calculated to be: " << (icopy_bot*WCPMTODRadius*WCPMTODRadius/(WCIDRadius*WCIDRadius)) << "\n";
-    G4cout << "############" << "\n";
+    G4cout << "############" << "\n";	
 
   } // END if isODConstructed
 

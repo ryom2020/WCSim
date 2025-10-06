@@ -78,7 +78,11 @@ WCSimRootTrigger::WCSimRootTrigger()
   fTriggerInfo.clear();
   
   IsZombie = true;
-  
+
+  //for getting evis
+  fTotalEnergyDepID = 0;
+  fTotalEnergyDepDS = 0;
+  fTotalEnergyDepOD = 0;
 }
 
 WCSimRootTrigger::WCSimRootTrigger(int Number,int Subevt)
@@ -218,6 +222,11 @@ WCSimRootTrigger & WCSimRootTrigger::operator=(const WCSimRootTrigger & in)
   fTriggerType = in.fTriggerType;
   fTriggerInfo = in.fTriggerInfo;
   IsZombie = in.IsZombie;
+
+  //for getting evis
+  fTotalEnergyDepID = in.fTotalEnergyDepID;
+  fTotalEnergyDepDS = in.fTotalEnergyDepDS;
+  fTotalEnergyDepOD = in.fTotalEnergyDepOD;
   return *this;
 }
 
@@ -569,8 +578,6 @@ WCSimRootCherenkovHit *WCSimRootTrigger::AddCherenkovHit(Int_t tubeID,
 							 std::vector<Double_t> truetime,
 							 std::vector<Int_t> parentSavedTrackID,
 							 std::vector<Float_t> photonStartTime,
-							 std::vector<Float_t> photonStartEnergy,
-							 std::vector<Float_t> photonEndEnergy,
 							 std::vector<TVector3> photonStartPos,
 							 std::vector<TVector3> photonEndPos,
 							 std::vector<TVector3> photonStartDir,
@@ -598,7 +605,7 @@ WCSimRootCherenkovHit *WCSimRootTrigger::AddCherenkovHit(Int_t tubeID,
 
     //WCSimRootCherenkovHitTime *cherenkovhittime =
     new(cherenkovhittimes[fNcherenkovhittimes++]) WCSimRootCherenkovHitTime(truetime[i],parentSavedTrackID[i],
-									    photonStartTime[i], photonStartEnergy[i], photonEndEnergy[i], startPos, endPos,
+									    photonStartTime[i], startPos, endPos,
 									    startDir, endDir, creatorProcess);
   }
   
@@ -624,17 +631,12 @@ WCSimRootCherenkovHit *WCSimRootTrigger::AddCherenkovHit(Int_t tubeID,
 //_____________________________________________________________________________
 
 WCSimRootCherenkovHitHistory *WCSimRootTrigger::AddCherenkovHitHistory(Int_t nRayScat,
-             Int_t nRamScat,
              Int_t nMieScat,
-					   std::vector<ReflectionSurface_t> reflec,
-					   std::vector<Float_t> &x,
-					   std::vector<Float_t> &y,
-					   std::vector<Float_t> &z,
-					   std::vector<StepType_t> &type )
+					   std::vector<ReflectionSurface_t> reflec)
 {
   // Add a new Cherenkov hit history to the list of Cherenkov hit histories
   TClonesArray &cherenkovhithistories = *fCherenkovHitHistories;
-  WCSimRootCherenkovHitHistory* cherenkovhithistory = new(cherenkovhithistories[fNcherenkovhithistories++]) WCSimRootCherenkovHitHistory(nRayScat,nRamScat,nMieScat,reflec,x,y,z,type);
+  WCSimRootCherenkovHitHistory* cherenkovhithistory = new(cherenkovhithistories[fNcherenkovhithistories++]) WCSimRootCherenkovHitHistory(nRayScat,nMieScat,reflec);
   return cherenkovhithistory;
 }
 
@@ -669,8 +671,6 @@ WCSimRootCherenkovHit::WCSimRootCherenkovHit(Int_t tubeID,
 WCSimRootCherenkovHitTime::WCSimRootCherenkovHitTime(Double_t truetime,
 						     Int_t parentSavedTrackID,
 						     Float_t photonStartTime,
-						     Float_t photonStartEnergy,
-						     Float_t photonEndEnergy,
 						     Float_t photonStartPos[3],
 						     Float_t photonEndPos[3],
 						     Float_t photonStartDir[3],
@@ -681,8 +681,6 @@ WCSimRootCherenkovHitTime::WCSimRootCherenkovHitTime(Double_t truetime,
   fTruetime        = truetime;
   fParentSavedTrackID = parentSavedTrackID;
   fPhotonStartTime = photonStartTime;
-  fPhotonStartEnergy = photonStartEnergy;
-  fPhotonEndEnergy = photonEndEnergy;
   fPhotonCreatorProcess = photonCreatorProcess;
   for (int i=0;i<3;i++) {
     fPhotonStartPos[i] = photonStartPos[i];
@@ -692,17 +690,12 @@ WCSimRootCherenkovHitTime::WCSimRootCherenkovHitTime(Double_t truetime,
   }
 }
 
-WCSimRootCherenkovHitHistory::WCSimRootCherenkovHitHistory(Int_t nRayScat,Int_t nRamScat, Int_t nMieScat, std::vector<ReflectionSurface_t> refle, std::vector<Float_t> &x, std::vector<Float_t> &y, std::vector<Float_t> &z, std::vector<StepType_t> & type)
+WCSimRootCherenkovHitHistory::WCSimRootCherenkovHitHistory(Int_t nRayScat, Int_t nMieScat, std::vector<ReflectionSurface_t> refle)
 {
   // Create a WCSimRootCherenkovHitHistory object and fill it with stuff
   fNRayScat = nRayScat;
-  fNRamScat = nRamScat;
   fNMieScat = nMieScat;
   fReflec = refle;
-  fStepsX = x;
-  fStepsY = y;
-  fStepsZ = z;
-  fStepsType = type;
 }
 
 //_____________________________________________________________________________
@@ -914,8 +907,6 @@ bool WCSimRootCherenkovHitTime::CompareAllVariables(const WCSimRootCherenkovHitT
   failed = (!ComparisonPassed(fTruetime, c->GetTruetime(), typeid(*this).name(), __func__, "Truetime")) || failed;
   failed = (!ComparisonPassed(fParentSavedTrackID, c->GetParentID(), typeid(*this).name(), __func__, "ParentSavedTrackID")) || failed;
   failed = (!ComparisonPassed(fPhotonStartTime, c->GetPhotonStartTime(), typeid(*this).name(), __func__, "PhotonStartTime")) || failed;
-  failed = (!ComparisonPassed(fPhotonStartEnergy, c->GetPhotonStartEnergy(), typeid(*this).name(), __func__, "PhotonStartEnergy")) || failed;
-  failed = (!ComparisonPassed(fPhotonEndEnergy, c->GetPhotonEndEnergy(), typeid(*this).name(), __func__, "PhotonEndEnergy")) || failed;
   failed = (!ComparisonPassed(fPhotonCreatorProcess, c->GetPhotonCreatorProcess(), typeid(*this).name(), __func__, "PhotonCreatorProcess")) || failed;
   for(int i = 0; i < 3; i++) {
     failed = (!ComparisonPassed(fPhotonStartPos[i], c->GetPhotonStartPos(i), typeid(*this).name(), __func__, TString::Format("%s[%d]", "PhotonStartPos", i))) || failed;
@@ -933,13 +924,8 @@ bool WCSimRootCherenkovHitHistory::CompareAllVariables(const WCSimRootCherenkovH
   bool failed = false;
 
   failed = (!ComparisonPassed(fNRayScat, c->GetNRayScatters(), typeid(*this).name(), __func__, "RayleighScattering")) || failed;
-  failed = (!ComparisonPassed(fNRamScat, c->GetNRamScatters(), typeid(*this).name(), __func__, "RamanScattering")) || failed;
   failed = (!ComparisonPassed(fNMieScat, c->GetNMieScatters(), typeid(*this).name(), __func__, "MieScattering")) || failed;
   failed = (!ComparisonPassedVec(std::vector<int>(fReflec.begin(),fReflec.end()), std::vector<int>(c->GetReflectionSurfaces().begin(),c->GetReflectionSurfaces().end()), typeid(*this).name(), __func__, "Reflection")) || failed;
-  failed = (!ComparisonPassedVec(fStepsX, c->GetStepsX(), typeid(*this).name(), __func__, "StepsX")) || failed;
-  failed = (!ComparisonPassedVec(fStepsY, c->GetStepsY(), typeid(*this).name(), __func__, "StepsY")) || failed;
-  failed = (!ComparisonPassedVec(fStepsZ, c->GetStepsZ(), typeid(*this).name(), __func__, "StepsZ")) || failed;
-  failed = (!ComparisonPassedVec(std::vector<int>(fStepsType.begin(),fStepsType.end()), std::vector<int>(c->GetStepsType().begin(),c->GetStepsType().end()), typeid(*this).name(), __func__, "StepsType")) || failed;
 
   return !failed;
 }

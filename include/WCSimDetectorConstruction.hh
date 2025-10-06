@@ -470,7 +470,7 @@ public:
   ///////////////////////////////
 
   void SetWCPMTODSize(G4String WCPMTODSize){
-    if(WCPMTODSize == "PMT3inch" || WCPMTODSize == "PMT5inch" || WCPMTODSize == "PMT8inch" || WCPMTODSize == "PMT3inch_ETEL9302B" || WCPMTODSize == "3inchR14374" || WCPMTODSize == "3inchR14374_FDOD" || WCPMTODSize == "3inchNNVT" ){
+    if(WCPMTODSize == "PMT8inch" || WCPMTODSize == "PMT5inch" || WCPMTODSize == "PMT3inch_ETEL9302B"){
       WCSimPMTObject *PMTOD = CreatePMTObject(WCPMTODSize, WCODCollectionName);
       WCPMTODName           = PMTOD->GetPMTName();
       WCPMTODExposeHeight   = PMTOD->GetExposeHeight();
@@ -999,6 +999,25 @@ private:
   std::vector<WCSimPmtInfo*> fpmts;
   std::vector<WCSimPmtInfo*> fpmts2;//For the hybrid config
   std::vector<WCSimPmtInfo*> fODpmts;
+
+
+  //for getting evis
+private:
+  G4double WCODInnerHeight;
+  G4double WCODInnerDiameter;
+  G4double WCODOuterHeight;
+  G4double WCODOuterDiameter;
+public:
+  void   SetWCODInnerHeight(G4double val) { WCODInnerHeight = val; }
+  void   SetWCODInnerDiameter(G4double val) { WCODInnerDiameter = val; }
+  void   SetWCODOuterHeight(G4double val) { WCODOuterHeight = val; }
+  void   SetWCODOuterDiameter(G4double val) { WCODOuterDiameter = val; }
+  
+  G4double GetWCODInnerHeight(){ return WCODInnerHeight; }
+  G4double GetWCODInnerDiameter(){ return WCODInnerDiameter; }
+  G4double GetWCODOuterHeight(){ return WCODOuterHeight; }
+  G4double GetWCODOuterDiameter(){ return WCODOuterDiameter; }
+  
 };
 
 #endif
