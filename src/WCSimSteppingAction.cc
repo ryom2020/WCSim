@@ -111,9 +111,11 @@ void WCSimSteppingAction::UserSteppingAction(const G4Step* aStep)
 
     if(track->GetTrackStatus() == fStopAndKill){
       if(boundary->GetStatus() == NoRINDEX){
-	G4cout << "Optical photon is killed because of missing refractive index in either " << thePrePoint->GetMaterial()->GetName() << " or " << thePostPoint->GetMaterial()->GetName() <<
-	" (transition from " << thePrePV->GetName() << " to " << thePostPV->GetName() << ")" <<
-	" : could also be caused by Overlaps with volumes with logicalBoundaries." << G4endl;
+
+	//inactive due to tentative support structure of PMTs by SUS w/o optical properties
+	//G4cout << "Optical photon is killed because of missing refractive index in either " << thePrePoint->GetMaterial()->GetName() << " or " << thePostPoint->GetMaterial()->GetName() <<
+	//" (transition from " << thePrePV->GetName() << " to " << thePostPV->GetName() << ")" <<
+	//" : could also be caused by Overlaps with volumes with logicalBoundaries." << G4endl;
 	
       }
       /* Debug :  
