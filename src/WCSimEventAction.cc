@@ -241,7 +241,9 @@ void WCSimEventAction::BeginOfEventAction(const G4Event*)
   fTotalEnergyDepID = 0.;
   fTotalEnergyDepDS = 0.;
   fTotalEnergyDepOD = 0.;
-  
+
+  //for entering gamma BG study
+  ClearGammaHits();
 }
 
 void WCSimEventAction::EndOfEventAction(const G4Event* evt)
@@ -1183,6 +1185,9 @@ void WCSimEventAction::FillRootEvent(G4int event_id,
   wcsimrootevent->SetTotalEnergyDepID(fTotalEnergyDepID);
   wcsimrootevent->SetTotalEnergyDepDS(fTotalEnergyDepDS);
   wcsimrootevent->SetTotalEnergyDepOD(fTotalEnergyDepOD);
+
+  //for entering gamma BG study
+  wcsimrootevent->SetGammaHit(gammaEnergies, gammaPositions);
   
   std::map<int,int> trajMap; // mapping of trackID and index
 
@@ -1755,6 +1760,9 @@ void WCSimEventAction::FillRootEventHybrid(G4int event_id,
   wcsimrootevent->SetTotalEnergyDepID(fTotalEnergyDepID);
   wcsimrootevent->SetTotalEnergyDepDS(fTotalEnergyDepDS);
   wcsimrootevent->SetTotalEnergyDepOD(fTotalEnergyDepOD);
+
+  //for entering gamma BG study
+  wcsimrootevent->SetGammaHit(gammaEnergies, gammaPositions);
 
 
   std::map<int,int> trajMap; // mapping of trackID and index

@@ -83,6 +83,10 @@ WCSimRootTrigger::WCSimRootTrigger()
   fTotalEnergyDepID = 0;
   fTotalEnergyDepDS = 0;
   fTotalEnergyDepOD = 0;
+
+  //for entering gamma BG
+  gammaEnergies.clear();
+  gammaPositions.clear();
 }
 
 WCSimRootTrigger::WCSimRootTrigger(int Number,int Subevt)
@@ -227,6 +231,11 @@ WCSimRootTrigger & WCSimRootTrigger::operator=(const WCSimRootTrigger & in)
   fTotalEnergyDepID = in.fTotalEnergyDepID;
   fTotalEnergyDepDS = in.fTotalEnergyDepDS;
   fTotalEnergyDepOD = in.fTotalEnergyDepOD;
+
+  //for entering gamma BG
+  gammaEnergies = in.gammaEnergies;
+  gammaPositions = in.gammaPositions;
+  
   return *this;
 }
 

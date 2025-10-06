@@ -195,7 +195,45 @@ void WCSimSteppingAction::UserSteppingAction(const G4Step* aStep)
 
     }
   }
-    
+
+  //for entering gamma BG study
+  if( thePrePoint->GetMaterial() && thePostPoint->GetMaterial()){
+    bool is_gamma = track->GetDefinition()->GetPDGEncoding() == 22;
+    G4double mom = thePostPoint->GetMomentum().mag();    
+    if( is_gamma && mom>0){  
+      G4ThreeVector pospre = thePrePoint->GetPosition();
+      G4double Rpre, Zpre;
+      G4ThreeVector pospost = thePostPoint->GetPosition();
+      G4double Rpost, Zpost;
+      if(det->GetIsNuPrism()){
+	Rpre = sqrt( pospre.x()*pospre.x() + pospre.z()*pospre.z() );
+	Zpre = fabs( pospre.y());
+	Rpost = sqrt( pospost.x()*pospost.x() + pospost.z()*pospost.z() );
+	Zpost = fabs( pospost.y());
+      }
+      else{
+	Rpre = sqrt( pospre.x()*pospre.x() + pospre.y()*pospre.y() );
+	Zpre = fabs( pospre.z() );
+	Rpost = sqrt( pospost.x()*pospost.x() + pospost.y()*pospost.y() );
+	Zpost = fabs( pospost.z() );
+      }
+      
+      double WCIDR = det->GetWCIDDiameter()/2.;
+      double WCIDZ = det->GetWCIDHeight()/2.;
+      double WCODInnerR = det->GetWCODInnerDiameter()/2.;
+      double WCODInnerZ = det->GetWCODInnerHeight()/2.;
+      double WCODOuterR = det->GetWCODOuterDiameter()/2.;
+      double WCODOuterZ = det->GetWCODOuterHeight()/2.;
+      
+      WCSimEventAction* evtAct = (WCSimEventAction*) G4RunManager::GetRunManager()->GetUserEventAction();
+
+      bool is_pre_DS = WCIDR < Rpre && WCIDZ < Zpre;
+      bool is_post_ID = Rpost <= WCIDR && Zpost <= WCIDZ;
+      bool is_enteringID = is_pre_DS && is_post_ID;
+      if(is_enteringID) evtAct->AddGammaHit(mom, pospost);
+    }
+  }
+
   
 
 }

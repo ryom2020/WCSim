@@ -100,6 +100,27 @@ public:
   G4double GetTotalEnergyDepID() const { return fTotalEnergyDepID; }
   G4double GetTotalEnergyDepDS() const { return fTotalEnergyDepDS; }
   G4double GetTotalEnergyDepOD() const { return fTotalEnergyDepOD; }
+
+  //for entering gamma BG study
+private:
+  std::vector<double> gammaEnergies;
+  std::vector<std::array<double, 3>> gammaPositions;
+public:
+  const std::vector<double>& GetGammaEnergies() const { return gammaEnergies; }
+  const std::vector<std::array<double, 3>>& GetGammaPositions() const { return gammaPositions; }
+  void AddGammaHit(double energy, const G4ThreeVector& position) {
+    gammaEnergies.push_back(energy);
+    std::array<double, 3> pos;
+    pos[0] = position.x();
+    pos[1] = position.y();
+    pos[2] = position.z();
+    gammaPositions.push_back(pos);
+  }  
+  void ClearGammaHits() {
+    gammaEnergies.clear();
+    gammaPositions.clear();
+  }
+  
   
 };
 

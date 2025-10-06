@@ -481,6 +481,20 @@ public:
   Double_t GetTotalEnergyDepDS() const { return fTotalEnergyDepDS; }
   Double_t GetTotalEnergyDepOD() const { return fTotalEnergyDepOD; }
 
+  //for entering gamma BG study
+private:
+  std::vector<double> gammaEnergies;
+  std::vector<std::array<double, 3>> gammaPositions;
+public:
+  void SetGammaHit(const std::vector<double>& Energies, const std::vector<std::array<double, 3>>& Positions) {
+    gammaEnergies.clear();
+    gammaPositions.clear();
+    gammaEnergies = Energies;
+    gammaPositions = Positions;
+  }
+  const std::vector<double>& GetGammaEnergies() const { return gammaEnergies; }
+  const std::vector<std::array<double, 3>>& GetGammaPositions() const { return gammaPositions; }
+
   
 public:
   WCSimRootTrigger();
