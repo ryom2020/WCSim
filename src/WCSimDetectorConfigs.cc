@@ -1702,7 +1702,7 @@ void WCSimDetectorConstruction::SetIWCD_WithOD_Geometry()
   CreateWLSObject(WLSType);
 
   // Customize OD PMT positions
-  SetODPMTPositionInput(wcsimdir_path+"/data/mPMT_Position_IWCD_OD.txt");
+  //SetODPMTPositionInput(wcsimdir_path+"/data/mPMT_Position_IWCD_OD.txt");
 }
 
 void WCSimDetectorConstruction::SetIWCD_WithOD_Geometry_OptionA()
