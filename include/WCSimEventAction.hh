@@ -109,6 +109,7 @@ public:
   const std::vector<double>& GetGammaEnergies() const { return gammaEnergies; }
   const std::vector<std::array<double, 3>>& GetGammaPositions() const { return gammaPositions; }
   void AddGammaHit(double energy, const G4ThreeVector& position) {
+    if(gammaEnergies.size()>500) return;
     gammaEnergies.push_back(energy);
     std::array<double, 3> pos;
     pos[0] = position.x();
