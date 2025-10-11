@@ -159,7 +159,9 @@ void WCSimSteppingAction::UserSteppingAction(const G4Step* aStep)
       is_above_Cherenkov_threshold = mom >= (1051. * MeV);
     }
 
+
     if (track->GetDefinition()->GetPDGCharge() != 0 && deltaE > 0 && is_above_Cherenkov_threshold) {
+      
       G4ThreeVector pospre = thePrePoint->GetPosition();
       G4double Rpre, Zpre;
       G4ThreeVector pospost = thePostPoint->GetPosition();
@@ -183,12 +185,21 @@ void WCSimSteppingAction::UserSteppingAction(const G4Step* aStep)
       double WCODInnerZ = det->GetWCODInnerHeight()/2.;
       double WCODOuterR = det->GetWCODOuterDiameter()/2.;
       double WCODOuterZ = det->GetWCODOuterHeight()/2.;
+
+      bool is_pre_ID  = Rpre <= WCIDR && Zpre <= WCIDZ;
+      bool is_post_ID  = Rpost <= WCIDR && Zpost <= WCIDZ;
       
+      bool is_pre_DS  = !is_pre_ID && Rpre <= WCODInnerR && Zpre <= WCODInnerZ;
+      bool is_post_DS  = !is_pre_ID && Rpre <= WCODInnerR && Zpre <= WCODInnerZ;
+
+      bool is_pre_OD  = !is_pre_ID && !is_pre_DS && Rpre <= WCODOuterR && Zpre <= WCODOuterZ;
+      bool is_post_OD  = !is_pre_ID && !is_pre_DS && Rpre <= WCODOuterR && Zpre <= WCODOuterZ;
+
+      bool is_ID = is_pre_ID && is_post_ID;
+      bool is_OD = is_pre_OD && is_post_OD;
+      bool is_DeadSpace = is_pre_DS || is_post_DS;     
+      	
       WCSimEventAction* evtAct = (WCSimEventAction*) G4RunManager::GetRunManager()->GetUserEventAction();
-      
-      bool is_ID = Rpre <= WCIDR && Zpre <= WCIDZ && Rpost <= WCIDR && Zpost <= WCIDZ ;
-      bool is_OD = WCODInnerR < Rpre && Rpre <= WCODOuterR && WCODInnerZ < Zpre && Zpre <= WCODOuterZ && WCODInnerR < Rpost && Rpost <= WCODOuterR && WCODInnerZ < Zpost && Zpost <= WCODOuterZ;
-      bool is_DeadSpace = (WCIDR < Rpre && Rpre <= WCODInnerR && WCIDZ < Zpre && Zpre <= WCODInnerZ) || ( WCIDR < Rpost && Rpost <= WCODInnerR && WCIDZ < Zpost && Zpost <= WCODInnerZ);
       if     (is_ID)         evtAct->AddEnergyDepID(deltaE);
       else if(is_OD)         evtAct->AddEnergyDepOD(deltaE);
       else if(is_DeadSpace)  evtAct->AddEnergyDepDS(deltaE);
