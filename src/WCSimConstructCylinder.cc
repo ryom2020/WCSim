@@ -4298,70 +4298,7 @@ G4LogicalVolume* WCSimDetectorConstruction::ConstructCylinderNoReplica()
 	//===matsumoto       
     bool is_sus_in_deadspace = true;
     if(is_sus_in_deadspace){
-	  //-----------------------------------------------------                              
-	  // Cylinder wall's SUS                                                               
-	  //-----------------------------------------------------                              
-	  
-      std::cout<<"matsumoto debug SUS"<<std::endl;
-	  
-      /*                                                                                 
-      //debug                                                                            
-      G4Tubs *solidCaveSUS_debug = new G4Tubs("solidCaveSUS_debug",                      
-                                              0,                                         
-                                              100.*cm,                                   
-                                              100.*cm,                                   
-                                              0. * deg,                                  
-                                              360. * deg);                               
-                                                                                         
-      G4LogicalVolume *logicCaveSUS_debug =                                              
-        new G4LogicalVolume(solidCaveSUS_debug,                                          
-                            G4Material::GetMaterial("StainlessSteel"),                   
-                            "CaveSUS_debug",                                             
-                            0, 0, 0);                                                    
-                                                                                         
-      //G4VPhysicalVolume *physiCaveTyvek =                                              
-      new G4PVPlacement(0,                                                               
-                        G4ThreeVector(0., 0., 0.),                                       
-                        logicCaveSUS_debug,                                              
-                        "CaveBarrelSUS_debug",                                           
-                        logicWCBarrel,                                                   
-                        false,                                                           
-                        checkOverlaps);                                                  
-      */
-      //G4NistManager* nist = G4NistManager::Instance();                                 
-      //G4Material* air = nist->FindOrBuildMaterial("G4_AIR");                           
-      //G4Material* lead = G4NistManager::Instance()->FindOrBuildMaterial("G4_Pb");
-
-	  double sus_thickness = 2 * cm;
-      double sus_outer_radius = WCIDDiameter/2. + WCBlackSheetThickness+WCODDeadSpace;
-      double sus_outer_z = WCIDHeight/2. + WCBlackSheetThickness+WCODDeadSpace;
-
-      G4Tubs *solidCaveSUS = new G4Tubs("solidCaveSUS",
-                                        sus_outer_radius - sus_thickness,
-                                        sus_outer_radius,
-                                        sus_outer_z,
-                                        0. * deg,
-                                        360. * deg);
-
-      std::cout<<"matsumoto debug SUS radius="<<sus_outer_radius<<" z="<<sus_outer_z<<st\
-d::endl;
-
-      G4LogicalVolume *logicCaveSUS =
-        new G4LogicalVolume(solidCaveSUS,
-                            G4Material::GetMaterial("StainlessSteel"),
-                            "CaveSUS",
-                            0, 0, 0);
-	  
-	  //G4VPhysicalVolume *physiCaveTyvek =
-      new G4PVPlacement(0,
-                        G4ThreeVector(0., 0., 0.),
-                        logicCaveSUS,
-                        "CaveBarrelSUS",
-                        logicWCBarrel,
-                        false,
-                        checkOverlaps);
-
-    /*                                                                                   
+	  /*                                                                                   
     //===optical properties                                                              
     //G4LogicalSkinSurface *TyvekCaveBarrelSurface =                                     
     new G4LogicalSkinSurface("TyvekCaveBarrelSurface", logicCaveTyvek, OpWaterTySurface)\
@@ -4373,23 +4310,8 @@ e rings in OGLSX Visualizer
     logicCaveTyvek->SetVisAttributes(showTyvekCave);                                     
     //logicCaveTyvek->SetVisAttributes(G4VisAttributes::Invisible); //amb79              
     */
-    //-----------------------------------------------------                              
-    // Cylinder caps' SUS                                                                
-    //-----------------------------------------------------
 
-	   G4Tubs *solidCaveCapsSUS = new G4Tubs("CaveCapsSUS",
-                                            0,
-                                            sus_outer_radius - sus_thickness,
-                                            .5 * sus_thickness,
-                                            0. * deg,
-                                            360. * deg);
-
-      G4LogicalVolume *logicCaveCapsSUS =
-        new G4LogicalVolume(solidCaveCapsSUS,
-                            G4Material::GetMaterial("StainlessSteel"),
-                            "CaveCapSUS",
-                            0, 0, 0);
-	   /*                                                                                   
+	  	   /*                                                                                   
     //===optical properties                                                              
     //G4LogicalSkinSurface *TyvekCaveTopSurface =                                        
     new G4LogicalSkinSurface("TyvekCaveTopSurface", logicCaveCapsTyvek, OpWaterTySurface\
@@ -4401,28 +4323,230 @@ e rings in OGLSX Visualizer
     //logicCaveCapsTyvek->SetVisAttributes(G4VisAttributes::Invisible); //amb79          
     */
 
-      G4ThreeVector CaveSUSPosition(0., 0., sus_outer_z - 0.5*sus_thickness);
+	  //-----------------------------------------------------                              
+	  // Cylinder wall's SUS                                                               
+	  //-----------------------------------------------------                              
+	  
+      std::cout<<"matsumoto debug SUS"<<std::endl;
+	  
+	  double sus_thickness = 2. * cm;
+      double sus_outer_radius = WCIDDiameter/2. + WCBlackSheetThickness+WCODDeadSpace;
+      double sus_outer_z = WCIDHeight/2. + WCBlackSheetThickness+WCODDeadSpace;
 
-      //G4VPhysicalVolume *physiTopCaveTyvek =                                           
-      new G4PVPlacement(0,
-                        CaveSUSPosition,
-                        logicCaveCapsSUS,
-                        "CaveTopSUS",
-                        logicWCBarrel,
-                        false,
-                        checkOverlaps);
+	  //taken from  OD Tyvek Barrel side
+	  G4double annulusZ[2] = {
+		mainAnnulusMinZ-(barrelCellHeight+WCBarrelPMTBotOffset+pmt_blacksheet_offset+1*mm+WCBlackSheetThickness),
+		// cover the whole barrel including the border ring
+		mainAnnulusMinZ+(barrelCellHeight+WCBarrelPMTTopOffset+pmt_blacksheet_offset+1*mm+WCBlackSheetThickness)+mainAnnulusHeight};
+	  G4double annulusODSUSRmax[2] = {(WCODRadius-WCODTyvekSheetThickness),
+		WCODRadius-WCODTyvekSheetThickness};
+	  G4double annulusODSUSRmin[2] = {(WCODRadius-WCODTyvekSheetThickness - sus_thickness),
+		WCODRadius-WCODTyvekSheetThickness - sus_thickness};
+	  
+	  G4Polyhedra* solidWCBarrelODSUS =
+		new G4Polyhedra("WCBarrelODSUS",
+						barrelPhiOffset, // phi start
+						totalAngle, //total phi
+						WCBarrelRingNPhi, //NPhi-gon
+						2,
+						annulusZ,
+						annulusODSUSRmin,
+						annulusODSUSRmax);
+	  
+	  G4LogicalVolume* logicWCBarrelODSUS =
+      new G4LogicalVolume(solidWCBarrelODSUS,
+                          G4Material::GetMaterial("StainlessSteel"),
+                          "WCBarrelODSUS",
+                          0,0,0);
+	  
+	  G4VisAttributes* WCBarrelODSUSCellVisAtt =
+		new G4VisAttributes(yellow);
+	  WCBarrelODSUSCellVisAtt->SetForceWireframe(true);
+	  WCBarrelODSUSCellVisAtt->SetForceAuxEdgeVisible(true); // force auxiliary edges to be shown
+	  
+	  logicWCBarrelODSUS->SetVisAttributes(G4VisAttributes::Invisible);
+	  //// Uncomment following for TYVEK visualization   
+	  logicWCBarrelODSUS->SetVisAttributes(WCBarrelODSUSCellVisAtt);
+	  
+	  
+	  //G4VPhysicalVolume* physiWCBarrelCellODTyvek = 
+	  new G4PVPlacement(0,
+						G4ThreeVector(0.,0.,0.),
+						logicWCBarrelODSUS,
+						"WCBarrelCellODSUS",
+						logicWCBarrel,
+						false,
+						0,
+						checkOverlaps);
+	  //G4LogicalSkinSurface *WaterTySurfaceSide =
+	  //new G4LogicalSkinSurface("WaterTySurfaceSide", logicWCBarrelODSUS, OpWaterTySurface);
+	  
+	  
+	  //-----------------------------------------------------                              
+	  // Cylinder caps' SUS                                                                
+	  //-----------------------------------------------------
+	  
+	  G4VSolid* solidWCODTopCapSUS = nullptr;
+	  G4VSolid* solidWCODBotCapSUS = nullptr;
+	  
+	  G4double odTopCapZ[4] = {
+		(-WCODDeadSpace+1*mm+WCBlackSheetThickness+pmt_blacksheet_offset    +WCODTyvekSheetThickness/2.+sus_thickness/2. ),
+		-.5*(sus_thickness),
+		-.5*(sus_thickness),
+		.5*(sus_thickness)};
+	  G4double odBotCapZ[4] = {
+		-(-WCODDeadSpace+1*mm+WCBlackSheetThickness+pmt_blacksheet_offset    +WCODTyvekSheetThickness/2.+sus_thickness/2.),
+		.5*(sus_thickness),
+		.5*(sus_thickness),
+		-.5*(sus_thickness)};
+	  G4double odCapRmin[4] = {
+		WCODRadius-WCODTyvekSheetThickness - sus_thickness,
+		WCODRadius-WCODTyvekSheetThickness - sus_thickness,
+		0,
+		0};
+	  G4double odCapRmax[4] = {
+		WCODRadius-WCODTyvekSheetThickness,
+		WCODRadius-WCODTyvekSheetThickness,
+		WCODRadius-WCODTyvekSheetThickness,
+		WCODRadius-WCODTyvekSheetThickness};
+	  
+	  if(WCBarrelRingNPhi*WCPMTperCellHorizontal == WCBarrelNumPMTHorizontal){
+		solidWCODTopCapSUS
+		  = new G4Polyhedra("WCODTopCapSUS",
+							barrelPhiOffset, // phi start
+							totalAngle, //phi end
+							WCBarrelRingNPhi, //NPhi-gon
+							4, // 4 z-planes
+							odTopCapZ, //position of the Z planes
+							odCapRmin, // min radius at the z planes
+							odCapRmax// max radius at the Z planes
+							);
+		solidWCODBotCapSUS
+		  = new G4Polyhedra("WCODBotCapSUS",
+							barrelPhiOffset, // phi start
+							totalAngle, //phi end
+							WCBarrelRingNPhi, //NPhi-gon
+							4, // 4 z-planes
+							odBotCapZ, //position of the Z planes
+							odCapRmin, // min radius at the z planes
+							odCapRmax// max radius at the Z planes
+							);
+	  } else {
+		// if there is an extra tower, the cap volume is a union of                          
+		// to polyhedra. We have to unite both parts, because there are                      
+		// PMTs that are on the border between both parts.                                   
+		G4Polyhedra* mainPartTop
+		  = new G4Polyhedra("WCODTopCapSUSMainPart",
+							barrelPhiOffset, // phi start
+							totalAngle, //phi end
+							WCBarrelRingNPhi, //NPhi-gon
+							4, // 4 z-planes
+							odTopCapZ, //position of the Z planes
+							odCapRmin, // min radius at the z planes
+							odCapRmax// max radius at the Z planes
+							);
+		G4Polyhedra* mainPartBot
+		  = new G4Polyhedra("WCODBotCapSUSMainPart",
+							barrelPhiOffset, // phi start
+							totalAngle, //phi end
+							WCBarrelRingNPhi, //NPhi-gon
+							4, // 4 z-planes
+							odBotCapZ, //position of the Z planes
+							odCapRmin, // min radius at the z planes
+							odCapRmax// max radius at the Z planes
+							);
+		G4double extraCapRmin[4];
+		G4double extraCapRmax[4];
+		for(int i = 0; i < 4 ; i++){
+		  extraCapRmin[i] = odCapRmin[i] != 0. ?  odCapRmin[i]/cos(dPhi/2.)*cos((2.*pi-totalAngle)/2.) : 0.;
+		  extraCapRmax[i] = odCapRmax[i] != 0. ?  odCapRmax[i]/cos(dPhi/2.)*cos((2.*pi-totalAngle)/2.) : 0.;
+		}
+		G4Polyhedra* extraSliceTop
+		  = new G4Polyhedra("WCODTopCapSUSExtraSlice",
+							totalAngle-2.*pi+barrelPhiOffset, // phi start
+							2.*pi -  totalAngle -G4GeometryTolerance::GetInstance()->GetSurfaceTolerance()/(10.*m), //total phi
+							// fortunately there are no PMTs an the gap!
+							1, //NPhi-gon
+							4, //  z-planes
+							odTopCapZ, //position of the Z planes
+							extraCapRmin, // min radius at the z planes
+							extraCapRmax// max radius at the Z planes
+							);
+		G4Polyhedra* extraSliceBot
+		  = new G4Polyhedra("WCODBotCapSUSExtraSlice",
+							totalAngle-2.*pi+barrelPhiOffset, // phi start                             
+							2.*pi -  totalAngle -G4GeometryTolerance::GetInstance()->GetSurfaceTolerance()/(10.*m), //total phi
+							// fortunately there are no PMTs an the gap!                        
+							1, //NPhi-gon                                                       
+							4, //  z-planes                                                     
+							odBotCapZ, //position of the Z planes                               
+							extraCapRmin, // min radius at the z planes                         
+							extraCapRmax// max radius at the Z planes                           
+							);
 
+		solidWCODTopCapSUS =
+		  new G4UnionSolid("WCODTopCapSUS", mainPartTop, extraSliceTop);
+		
+		solidWCODBotCapSUS =
+		  new G4UnionSolid("WCODBotCapSUS", mainPartBot, extraSliceBot);
+		
+	  }
+	  
+	  G4LogicalVolume* logicWCODTopCapSUS =
+		new G4LogicalVolume(solidWCODTopCapSUS,
+							G4Material::GetMaterial("StainlessSteel"),
+							"WCODTopCapSUS",
+							0,0,0);
+      G4LogicalVolume* logicWCODBotCapSUS =
+		new G4LogicalVolume(solidWCODBotCapSUS,
+							G4Material::GetMaterial("StainlessSteel"),
+							"WCODBotCapSUS",
+							0,0,0);
+	  
+    G4VisAttributes* WCCapsODSUSCellVisAtt =
+      new G4VisAttributes(yellow);
+    WCCapsODSUSCellVisAtt->SetForceWireframe(true);
 
-      CaveSUSPosition.setZ(-CaveSUSPosition.getZ());
+    logicWCODTopCapSUS->SetVisAttributes(G4VisAttributes::Invisible);
+	logicWCODBotCapSUS->SetVisAttributes(G4VisAttributes::Invisible);
+    //// Uncomment following for SUU visualization                                       
+    logicWCODTopCapSUS->SetVisAttributes(WCCapsODSUSCellVisAtt);
+	logicWCODBotCapSUS->SetVisAttributes(WCCapsODSUSCellVisAtt);
+	
+    G4ThreeVector CapSUSPosition(0.,0.,WCIDHeight/2. + WCODDeadSpace -WCODTyvekSheetThickness/2.-sus_thickness/2.);
 
-      //G4VPhysicalVolume *physiBottomCaveTyvek =                                        
-      new G4PVPlacement(0,
-                        CaveSUSPosition,
-                        logicCaveCapsSUS,
-                        "CaveBottomSUS",
-                        logicWCBarrel,
-                        false,
-                        checkOverlaps);
+	std::cout<<"matsumoto debug SUS odTopCapZ[0] "<<odTopCapZ[0]<<std::endl;
+	std::cout<<"matsumoto debug SUS odBotCapZ[0] "<<odBotCapZ[0]<<std::endl;
+	std::cout<<"matsumoto debug SUS CapSUSPosition.z() "<<CapSUSPosition.z()<<std::endl;	
+	std::cout<<"matsumoto debug SUS WCIDHeight/2. + WCODDeadSpace "<<WCIDHeight/2. + WCODDeadSpace<<std::endl;	
+	
+    //G4VPhysicalVolume* physiWCODTopCapsTyvek =    
+	new G4PVPlacement(0,
+					  CapSUSPosition,
+					  logicWCODTopCapSUS,
+					  "WCODTopCapsSUS",
+					  logicWCBarrel,
+					  false,
+					  0,
+					  checkOverlaps);
+	
+    //G4LogicalSkinSurface *WaterTySurfaceTop = 
+	//new G4LogicalSkinSurface("WaterTySurfaceTop", logicWCODTopCapSUS, OpWaterTySurface);
+	
+    CapSUSPosition.setZ(-CapSUSPosition.getZ());
+	
+    //G4VPhysicalVolume* physiWCODBottomCapsTyvek =
+	new G4PVPlacement(0,
+					  CapSUSPosition,
+					  logicWCODBotCapSUS,
+					  "WCODBottomCapsSUS",
+					  logicWCBarrel,
+					  false,
+					  0,
+					  checkOverlaps);
+	//new G4LogicalSkinSurface("WaterTySurfaceBot", logicWCODBotCapSUS, OpWaterTySurface);
+	
+	
 	}//===end of SUS
 	
   } // END if isODConstructed
