@@ -190,10 +190,10 @@ void WCSimSteppingAction::UserSteppingAction(const G4Step* aStep)
       bool is_post_ID  = Rpost <= WCIDR && Zpost <= WCIDZ;
       
       bool is_pre_DS  = !is_pre_ID && Rpre <= WCODInnerR && Zpre <= WCODInnerZ;
-      bool is_post_DS  = !is_pre_ID && Rpre <= WCODInnerR && Zpre <= WCODInnerZ;
+      bool is_post_DS  = !is_post_ID && Rpost <= WCODInnerR && Zpost <= WCODInnerZ;
 
       bool is_pre_OD  = !is_pre_ID && !is_pre_DS && Rpre <= WCODOuterR && Zpre <= WCODOuterZ;
-      bool is_post_OD  = !is_pre_ID && !is_pre_DS && Rpre <= WCODOuterR && Zpre <= WCODOuterZ;
+      bool is_post_OD  = !is_post_ID && !is_post_DS && Rpost <= WCODOuterR && Zpost <= WCODOuterZ;
 
       bool is_ID = is_pre_ID && is_post_ID;
       bool is_OD = is_pre_OD && is_post_OD;
