@@ -245,7 +245,7 @@ void WCSimSteppingAction::UserSteppingAction(const G4Step* aStep)
       
       if(is_enteringID){
 	WCSimEventAction* evtAct = (WCSimEventAction*) G4RunManager::GetRunManager()->GetUserEventAction();	
-	evtAct->AddGammaHit(mom, pospost);
+	evtAct->AddGammaHit(mom, pospre);
       }
       
     }
