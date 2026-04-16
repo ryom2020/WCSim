@@ -77,6 +77,8 @@ G4Colour  yellow  (1.0, 1.0, 0.0) ;  // yellow
 #define ACTIVATE_IDPMTS
 #endif
 
+double ODPMTOffset = 0.0*cm;
+
 G4LogicalVolume* WCSimDetectorConstruction::ConstructCylinder()
 {
   G4cout << "**** Building Cylindrical Detector ****" << G4endl;
@@ -1522,8 +1524,9 @@ G4LogicalVolume* WCSimDetectorConstruction::ConstructCylinder()
 
         G4ThreeVector topWLSpos = G4ThreeVector(xoffset,
                                                 yoffset,
-                                                ((WCIDHeight + 2*WCODDeadSpace)/2)+WCODTyvekSheetThickness);
-
+                                                //((WCIDHeight + 2*WCODDeadSpace)/2)+WCODTyvekSheetThickness);
+                                                ((WCIDHeight + 2*WCODDeadSpace)/2)+WCODTyvekSheetThickness + ODPMTOffset );//matsumoto
+		
         G4ThreeVector bottomWLSpos = G4ThreeVector(xoffset,
                                                    yoffset,
                                                    -topWLSpos.getZ());
@@ -4069,7 +4072,8 @@ G4LogicalVolume* WCSimDetectorConstruction::ConstructCylinderNoReplica()
 
               G4cout << "Adding OD PMT in iz = "<< iz <<" iphi = "<< iphi << " cell " << i << ", " << j << G4endl;
 
-              G4ThreeVector Container =  G4ThreeVector(WCODRadius,
+              //G4ThreeVector Container =  G4ThreeVector(WCODRadius,
+              G4ThreeVector Container =  G4ThreeVector(WCODRadius + ODPMTOffset,//matsumoto
                                                       -barrelODCellWidth/2.+(i+0.5)*horizontalODSpacing+((G4int)(std::pow(-1,j))*(G4int)(WCODPMTShift)/2),
                                                       -(barrelCellHeight * (barrelODCellWidth/barrelCellWidth))/2.+(j+0.5)*verticalODSpacing + z_offset);
 
@@ -4247,8 +4251,9 @@ G4LogicalVolume* WCSimDetectorConstruction::ConstructCylinderNoReplica()
 
           G4ThreeVector topWLSpos = G4ThreeVector(xoffset,
                                                   yoffset,
-                                                  ((WCIDHeight + 2*WCODDeadSpace)/2)+WCODTyvekSheetThickness);
-
+                                                  //((WCIDHeight + 2*WCODDeadSpace)/2)+WCODTyvekSheetThickness);
+												  ((WCIDHeight + 2*WCODDeadSpace)/2)+WCODTyvekSheetThickness + ODPMTOffset);//matsumoto
+		  
           G4ThreeVector bottomWLSpos = G4ThreeVector(xoffset,
                                                     yoffset,
                                                     -topWLSpos.getZ());
