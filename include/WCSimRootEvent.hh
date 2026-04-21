@@ -468,19 +468,53 @@ private:
 
   bool IsZombie; //!< Will be true if unfilled, false if filled 
 
-  //for getting evis
+  //for evis
 private:
-  Double_t fTotalEnergyDepID;
-  Double_t fTotalEnergyDepDS;
-  Double_t fTotalEnergyDepOD;
+  std::array<Double_t, 1000> fEdepID;//energy deposit
+  std::array<Double_t, 1000> fEdepDS;
+  std::array<Double_t, 1000> fEdepOD;
 public:
-  void SetTotalEnergyDepID(Double_t val) { fTotalEnergyDepID = val; }
-  void SetTotalEnergyDepDS(Double_t val) { fTotalEnergyDepDS = val; }
-  void SetTotalEnergyDepOD(Double_t val) { fTotalEnergyDepOD = val; }
-  Double_t GetTotalEnergyDepID() const { return fTotalEnergyDepID; }
-  Double_t GetTotalEnergyDepDS() const { return fTotalEnergyDepDS; }
-  Double_t GetTotalEnergyDepOD() const { return fTotalEnergyDepOD; }
+  void SetEdepID(const std::array<Double_t, 1000>& val) { fEdepID = val; }
+  void SetEdepDS(const std::array<Double_t, 1000>& val) { fEdepDS = val; }
+  void SetEdepOD(const std::array<Double_t, 1000>& val) { fEdepOD = val; }
+  
+  Double_t GetEdepBinWidth() const { return 10; }//ns
+  int GetEdepNBins() const { return fEdepID.size(); }//ns
+  int GetEdepTindex(Double_t time) const {
+    if(time<0) return 0;
+    int it = time/GetEdepBinWidth();//ns
+    if(it>=fEdepID.size()) return fEdepID.size()-1;
+    return it;
+  }
+  
+  Double_t GetEdepID(int ibin) const { return fEdepID[ibin]; }
+  Double_t GetEdepDS(int ibin) const { return fEdepDS[ibin]; }
+  Double_t GetEdepOD(int ibin) const { return fEdepOD[ibin]; }
+  
+  Double_t GetEdepID(Double_t t0=-1e10, Double_t t1=1e10) const {
+    Double_t Edep = 0;
+    int i_t0 = GetEdepTindex(t0);
+    int i_t1 = GetEdepTindex(t1);
+    for(int ibin = i_t0; ibin<= i_t1; ibin++) Edep += fEdepID[ibin];
+    return Edep;
+  }
+  Double_t GetEdepDS(Double_t t0=-1e10, Double_t t1=1e10) const {
+    Double_t Edep = 0;
+    int i_t0 = GetEdepTindex(t0);
+    int i_t1 = GetEdepTindex(t1);
+    for(int ibin = i_t0; ibin<= i_t1; ibin++) Edep += fEdepDS[ibin];
+    return Edep;
+  }
+  Double_t GetEdepOD(Double_t t0=-1e10, Double_t t1=1e10) const {
+    Double_t Edep = 0;
+    int i_t0 = GetEdepTindex(t0);
+    int i_t1 = GetEdepTindex(t1);
+    for(int ibin = i_t0; ibin<= i_t1; ibin++) Edep += fEdepOD[ibin];
+    return Edep;
+  }
+    
 
+  
   //for entering gamma BG study
 private:
   std::vector<double> gammaEnergies;

@@ -161,7 +161,7 @@ G4LogicalVolume* WCSimDetectorConstruction::ConstructCylinder()
   WCLength    = WCIDHeight + 2*(WCODHeightWaterDepth + WCBlackSheetThickness + WCODDeadSpace + WCODTyvekSheetThickness + 1*mm);
   WCRadius    = (outerAnnulusRadius + WCODLateralWaterDepth)/cos(dPhi/2.) ;
 
-  //for getting evis
+  //for evis
   G4double DSthickness = WCBlackSheetThickness + WCODDeadSpace + WCODTyvekSheetThickness;// + WCODWLSPlatesThickness;
   G4double odinnerdiameter = WCIDDiameter + DSthickness*2.;
   G4double odinnerheight = WCIDHeight + DSthickness*2.;

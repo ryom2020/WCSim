@@ -88,19 +88,26 @@ private:
   G4int fEvNum;
 
 
-  //for getting evis
+  //for evis
 private:
-  G4double fTotalEnergyDepID;
-  G4double fTotalEnergyDepDS;
-  G4double fTotalEnergyDepOD;
+  std::array<Double_t, 1000> fEdepID;//energy deposit
+  std::array<Double_t, 1000> fEdepDS;
+  std::array<Double_t, 1000> fEdepOD;
 public:
-  void AddEnergyDepID(G4double edep) { fTotalEnergyDepID += edep;  }
-  void AddEnergyDepDS(G4double edep) { fTotalEnergyDepDS += edep;  }
-  void AddEnergyDepOD(G4double edep) { fTotalEnergyDepOD += edep;  }
-  G4double GetTotalEnergyDepID() const { return fTotalEnergyDepID; }
-  G4double GetTotalEnergyDepDS() const { return fTotalEnergyDepDS; }
-  G4double GetTotalEnergyDepOD() const { return fTotalEnergyDepOD; }
-
+  Double_t GetEdepBinWidth(){ return 10; }//ns
+  int GetEdepTindex(G4double time){
+    if(time<0) return 0;
+    int it = time/GetEdepBinWidth();//ns
+    if(it>=fEdepID.size()) return fEdepID.size()-1;
+    return it;
+  }
+  void AddEdepID(G4double edep, G4double time) { fEdepID[GetEdepTindex(time)] += edep;  }
+  void AddEdepDS(G4double edep, G4double time) { fEdepDS[GetEdepTindex(time)] += edep;  }
+  void AddEdepOD(G4double edep, G4double time) { fEdepOD[GetEdepTindex(time)] += edep;  }
+  std::array<Double_t, 1000> GetEdepID() const { return fEdepID; }
+  std::array<Double_t, 1000> GetEdepDS() const { return fEdepDS; }
+  std::array<Double_t, 1000> GetEdepOD() const { return fEdepOD; }
+  
   //for entering gamma BG study
 private:
   std::vector<double> gammaEnergies;

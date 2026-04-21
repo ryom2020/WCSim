@@ -237,10 +237,10 @@ void WCSimEventAction::BeginOfEventAction(const G4Event*)
   }
   G4cout << "Starting event " << fEvNum << G4endl;
 
-  //for getting evis
-  fTotalEnergyDepID = 0.;
-  fTotalEnergyDepDS = 0.;
-  fTotalEnergyDepOD = 0.;
+  //for evis
+  fEdepID.fill(0.);
+  fEdepDS.fill(0.);
+  fEdepOD.fill(0.);
 
   //for entering gamma BG study
   ClearGammaHits();
@@ -1182,9 +1182,9 @@ void WCSimEventAction::FillRootEvent(G4int event_id,
   wcsimrootevent->SetHeader(event_id, GetRunAction()->GetRunID(), 0); // will be set later.
 
   //for getting evis
-  wcsimrootevent->SetTotalEnergyDepID(fTotalEnergyDepID);
-  wcsimrootevent->SetTotalEnergyDepDS(fTotalEnergyDepDS);
-  wcsimrootevent->SetTotalEnergyDepOD(fTotalEnergyDepOD);
+  wcsimrootevent->SetEdepID(fEdepID);
+  wcsimrootevent->SetEdepDS(fEdepDS);
+  wcsimrootevent->SetEdepOD(fEdepOD);
 
   //for entering gamma BG study
   wcsimrootevent->SetGammaHit(gammaEnergies, gammaPositions);
@@ -1756,10 +1756,10 @@ void WCSimEventAction::FillRootEventHybrid(G4int event_id,
   wcsimrootevent = wcsimrootsuperevent->GetTrigger(0);
   wcsimrootevent->SetHeader(event_id, GetRunAction()->GetRunID(), 0); // will be set later.
 
-  //for getting evis
-  wcsimrootevent->SetTotalEnergyDepID(fTotalEnergyDepID);
-  wcsimrootevent->SetTotalEnergyDepDS(fTotalEnergyDepDS);
-  wcsimrootevent->SetTotalEnergyDepOD(fTotalEnergyDepOD);
+  //for evis
+  wcsimrootevent->SetEdepID(fEdepID);
+  wcsimrootevent->SetEdepDS(fEdepDS);
+  wcsimrootevent->SetEdepOD(fEdepOD);
 
   //for entering gamma BG study
   wcsimrootevent->SetGammaHit(gammaEnergies, gammaPositions);

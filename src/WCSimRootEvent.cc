@@ -80,9 +80,9 @@ WCSimRootTrigger::WCSimRootTrigger()
   IsZombie = true;
 
   //for getting evis
-  fTotalEnergyDepID = 0;
-  fTotalEnergyDepDS = 0;
-  fTotalEnergyDepOD = 0;
+  fEdepID.fill(0.);
+  fEdepDS.fill(0.);
+  fEdepOD.fill(0.);
 
   //for entering gamma BG
   gammaEnergies.clear();
@@ -228,9 +228,9 @@ WCSimRootTrigger & WCSimRootTrigger::operator=(const WCSimRootTrigger & in)
   IsZombie = in.IsZombie;
 
   //for getting evis
-  fTotalEnergyDepID = in.fTotalEnergyDepID;
-  fTotalEnergyDepDS = in.fTotalEnergyDepDS;
-  fTotalEnergyDepOD = in.fTotalEnergyDepOD;
+  fEdepID = in.fEdepID;
+  fEdepDS = in.fEdepDS;
+  fEdepOD = in.fEdepOD;
 
   //for entering gamma BG
   gammaEnergies = in.gammaEnergies;

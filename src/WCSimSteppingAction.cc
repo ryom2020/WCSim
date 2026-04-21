@@ -198,12 +198,14 @@ void WCSimSteppingAction::UserSteppingAction(const G4Step* aStep)
       bool is_ID = is_pre_ID && is_post_ID;
       bool is_OD = is_pre_OD && is_post_OD;
       bool is_DeadSpace = is_pre_DS || is_post_DS;     
-      	
-      WCSimEventAction* evtAct = (WCSimEventAction*) G4RunManager::GetRunManager()->GetUserEventAction();
-      if     (is_ID)         evtAct->AddEnergyDepID(deltaE);
-      else if(is_OD)         evtAct->AddEnergyDepOD(deltaE);
-      else if(is_DeadSpace)  evtAct->AddEnergyDepDS(deltaE);
 
+      G4double time = aStep->GetPreStepPoint()->GetGlobalTime();
+      
+      WCSimEventAction* evtAct = (WCSimEventAction*) G4RunManager::GetRunManager()->GetUserEventAction();
+      if     (is_ID)         evtAct->AddEdepID(deltaE, time);
+      else if(is_OD)         evtAct->AddEdepOD(deltaE, time);
+      else if(is_DeadSpace)  evtAct->AddEdepDS(deltaE, time);
+      
     }
   }
 
